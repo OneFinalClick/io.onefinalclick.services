@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
+using Object = UnityEngine.Object;
 
 namespace FinalClick.Services.Editor
 {
@@ -20,7 +22,7 @@ namespace FinalClick.Services.Editor
             return servicesPrefab != null;
         }
         
-        public static IReadOnlyList<ApplicationServiceRegistrationData> GetApplicationServiceRegistrationData()
+        public static IReadOnlyCollection<ApplicationServiceRegistrationData> GetApplicationServiceRegistrationData()
         {
             var configObject = GetOrCreateServicesSettingsConfigObject();
             return configObject.ApplicationServiceData;
@@ -63,12 +65,6 @@ namespace FinalClick.Services.Editor
             InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { configObject }, SettingsPath, true);
         }
 
-        public static List<ApplicationServiceRegistrationData> GetApplicationServiceData()
-        {
-            var configObject = GetOrCreateServicesSettingsConfigObject();
-            return configObject.ApplicationServiceData;
-        }
-
         private static void SyncApplicationServiceDataWithCurrentTypes()
         {
             var configObject = GetOrCreateServicesSettingsConfigObject();
@@ -77,15 +73,14 @@ namespace FinalClick.Services.Editor
             var validTypes = FinalClick.Services.Attributes.RegisterAsApplicationServiceAttribute.GetTypesWithApplicationServiceAttribute().ToHashSet();
 
             // Remove any types that should no longer be registered.
-            configObject.ApplicationServiceData.RemoveAll(data => data.IsDataStillValid() == false);
+            configObject.RemoveAllNoneValidData();
 
             foreach (var type in validTypes)
             {
-                bool exists = configObject.ApplicationServiceData.Exists(data => data.GetServiceType() == type);
+                bool exists = configObject.Exists(type);
                 if (!exists)
                 {
                     ApplicationServiceRegistrationData newData = new ApplicationServiceRegistrationData(type);
-                    configObject.ApplicationServiceData.Add(newData);
                 }
             }
 
