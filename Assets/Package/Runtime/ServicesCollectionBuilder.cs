@@ -108,11 +108,10 @@ namespace FinalClick.Services
         {
             foreach (var t in types)
             {
-
                 if (t.IsInstanceOfType(service) == false)
                     throw new ArgumentException($"Service must be assignable to {t}", nameof(types));
 
-                _registeredServices[t] = service;
+                _registeredServices.Add(t, service);
             }
 
             if (service is IService managedService)
@@ -152,42 +151,6 @@ namespace FinalClick.Services
             foreach (GameObject go in scene.GetRootGameObjects())
             {
                 RegisterGameObject(go);
-            }
-        }
-
-        public void RegisterAutoRegisterAsApplicationAttributeService()
-        {
-            var types = RegisterAsApplicationServiceAttribute.GetTypesWithApplicationServiceAttribute();
-
-            foreach (var type in types)
-            {
-                object instance;
-                try
-                {
-                    instance = Activator.CreateInstance(type);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Failed to create instance of type {type.FullName}: {ex.Message}");
-                    continue;
-                }
-
-                var attribute = type.GetCustomAttribute<RegisterAsApplicationServiceAttribute>(false);
-                if (attribute == null)
-                {
-                    Debug.LogError($"Type {type.FullName} was expected to have {nameof(RegisterAsApplicationServiceAttribute)} but none was found.");
-                    continue;
-                }
-
-                if (attribute.RegisterSelfAsServiceType == true)
-                {
-                    Register(instance, instance.GetType());
-                }
-                else
-                {
-                    
-                    Register(instance, attribute.RegisterTypes);
-                }
             }
         }
 
