@@ -81,6 +81,7 @@ namespace FinalClick.Services.Editor
                 if (!exists)
                 {
                     ApplicationServiceRegistrationData newData = new ApplicationServiceRegistrationData(type);
+                    configObject.Add(newData);
                 }
             }
 
