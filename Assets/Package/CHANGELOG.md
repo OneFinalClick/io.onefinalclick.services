@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.0] - 2026-05-25
+
+### Added
+- Added event when application services are built
+
 ## [2.0.2] - 2025-05-03
 
 ### Changed

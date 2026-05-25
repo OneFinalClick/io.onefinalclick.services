@@ -1,6 +1,5 @@
-using FinalClick.Services.Injection;
+using System;
 using JetBrains.Annotations;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEditor;
 
@@ -11,6 +10,8 @@ namespace FinalClick.Services
         private static ServiceCollection _serviceCollection;
         private static bool IsStarted => _serviceCollection != null && _serviceCollection.IsStarted;
         internal static ServiceCollection ServiceCollection => _serviceCollection;
+
+        public static event Action OnBuildApplicationServicesEvent;
 
         public static bool HasStarted()
         {
@@ -27,6 +28,7 @@ namespace FinalClick.Services
             builder.RegisterGameObject(gameObject);
             
             _serviceCollection = builder.Build();
+            OnBuildApplicationServicesEvent?.Invoke();
             StartServices();
         }
 
