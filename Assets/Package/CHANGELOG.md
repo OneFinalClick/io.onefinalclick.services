@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.0] - 2026-05-28
+
+### Changed
+- set StartSceneServices to public, so it can be called manually.
+
+
 ## [2.1.0] - 2026-05-25
 
 ### Added

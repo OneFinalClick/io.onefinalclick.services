@@ -50,8 +50,8 @@ namespace FinalClick.Services
 
             return services.Get<TI>();
         }
-        
-        private static void StartServicesForScene(Scene scene)
+
+        public static void StartServicesForScene(Scene scene)
         { 
             Debug.Assert(_sceneServices.ContainsKey(scene) == false, "Services already started");
             
