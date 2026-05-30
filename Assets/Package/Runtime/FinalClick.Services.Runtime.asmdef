@@ -1,7 +1,7 @@
 {
     "name": "FinalClick.Services.Runtime",
     "rootNamespace": "FinalClick.Services",
-    "references": [],
+    "references": ["GUID:a0a22b5799a9d9b45b4bc3f8e04efef1"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

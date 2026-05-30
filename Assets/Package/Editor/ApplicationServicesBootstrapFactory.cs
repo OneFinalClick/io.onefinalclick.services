@@ -1,3 +1,4 @@
+using FinalClick.ProjectSettings;
 using UnityEngine;
 
 namespace FinalClick.Services.Editor
@@ -7,9 +8,9 @@ namespace FinalClick.Services.Editor
         internal static GameObject Create()
         {
             // Create from prefab in settings, or make blank gameobject.
-            bool usePrefab = ServicesProjectSettings.TryGetServicesPrefab(out GameObject servicesPrefab);
+            bool usePrefab = ProjectSettingsDatabase.Get<ServicesProjectSettings>().TryGetServicesPrefab(out GameObject servicesPrefab);
 
-            GameObject servicesInstance = usePrefab ? GameObject.Instantiate(servicesPrefab) : new GameObject("Application Services");
+            GameObject servicesInstance = usePrefab ? Object.Instantiate(servicesPrefab) : new GameObject("Application Services");
 
             AddSavedServicesToApplicationServices(servicesInstance);
             SetGameObjectAsApplicationServices(servicesInstance);
@@ -19,15 +20,12 @@ namespace FinalClick.Services.Editor
 
         private static void AddSavedServicesToApplicationServices(GameObject gameObject)
         {
-            var component = gameObject.AddComponent<RegisterApplicationServices>();
-            var servicesData = ServicesProjectSettings.GetApplicationServiceRegistrationData();
-            component.SetData(servicesData);
+            gameObject.AddComponent<RegisterNoneMonoBehaviourApplicationServices>();
         }
         
         private static void SetGameObjectAsApplicationServices(GameObject gameObject)
         {
             gameObject.AddComponent<ApplicationServicesMarker>();
-
         }
     }
 }

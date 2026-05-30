@@ -2,7 +2,8 @@
     "name": "FinalClick.Services.Editor",
     "rootNamespace": "FinalClick.Services.Editor",
     "references": [
-        "FinalClick.Services.Runtime"
+        "FinalClick.Services.Runtime",
+        "FinalClick.ProjectSettings.Runtime"
     ],
     "includePlatforms": [
         "Editor"
