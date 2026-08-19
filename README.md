@@ -1,7 +1,7 @@
 Installation: `"io.finalclick.services": "https://github.com/FinalClick/io.finalclick.services.git?path=/Assets/Package",`
 
 # FinalClick – Services
-**Unity Package:** `io.finalclick.services`
+**Package:** `io.finalclick.services`
 
 A simple lightweight **service locator** and **dependency injection** system for Unity.  
 Use it to replace hard-referenced singletons with decoupled, testable services.
@@ -25,7 +25,7 @@ GameManager gameManager = gameObject.GetService<GameManager>();
 
 ## Overview
 
-`FinalClick.Services` allows you to register and resolve services both at the Project/Application level or at an Individual Scene level. Services can be pure C# classes or MonoBehaviours if you require references to assets or scene objects.
+`FinalClick.Services` allows you to register and resolve services both at the Project/Application scope or at an Individual Scene scope. Services can be pure C# classes or MonoBehaviours if you require references to assets or scene objects.
 
 ---
 
@@ -33,8 +33,8 @@ GameManager gameManager = gameObject.GetService<GameManager>();
 
 - 🔍 **Automatic Service Discovery** via `RegisterServices` and `RegisterAsService` attributes.
 - 🧩 ***Automatic Dependency Injection** via the `InjectService` property attribute.
-- 💡 **Project Level Services** via `ApplicationServices`.
-- 🎬 **Scene-scoped Services** via `SceneServices`.
+- 💡 **Application Scoped Services** via `ApplicationServices`.
+- 🎬 **Scene Scoped Services** via `SceneServices`.
 - ⚙️ **Lifecycle Hooks** via the `IService` interface. (`OnServiceStart`, `OnServiceUpdate`, `OnServiceStop`)
 - 🚀 **Disable Domain Reload Support**: automatic start and stops services during scene load and unload, and when entering or exiting Play Mode.
 
@@ -84,23 +84,23 @@ GameObject.GetService<T>()
                     └─ ApplicationServices.Get<T>()
 ```
 
-### GameObject Level
+### From GameObject
 
 ```csharp
-ITimeService timeService = gameObject.GetService<ITimeService>;
+ITimeService timeService = gameObject.GetService<ITimeService>();
 ```
 
-This method requires access to a GameObject. It will first check if the scene the GameObject is in has the service it needs. If not found, it will then see if the Application has the service. This means you can have different service instances for each scene.
+This method requires access to a GameObject instance. It will first attempt to get the service from the Scene Scope of the scene that `gameObject` is in. If not found, it will then fallback to find a service in the Application Scope.
 
-### Scene Level
+### From Scene 
 
 ```csharp
 ITimeService timeService = SceneServices.Get<ITimeService>(scene);
 ```
 
-This will require a reference to a scene, usually via `gameObject.scene`. It will first check if the scene has the service it needs. If not, it will check the ApplicationServices
+This will require a reference to a scene, such as from `gameObject.scene`. It will search for the service in the Scene Scope. If not found, it will then fallback to find a service in the Application Scope
 
-### Application/Project Level
+### From Application
 
 ```csharp
 ITimeService timeService = ApplicationServices.Get<ITimeService>(scene);
@@ -112,7 +112,7 @@ This can be called anywhere and requires no references to any Unity Object
 
 ### Registering Pure C# Services
 
-To register services at the project/application level create a static method marked with the `[RegisterServices]` attribute.
+To register services at the application scope create a static method marked with the `[RegisterServices]` attribute.
 
 Example:
 
@@ -128,7 +128,7 @@ public static void RegisterMyServices(ServiceCollectionBuilder builder)
 - It must accept exactly **one parameter**: `ServiceCollectionBuilder`.
 - These methods are automatically called **before the first scene is loaded**.
 
-### Registering Unity MonoBehaviour Services
+### Registering MonoBehaviour Services
 
 > Using MonoBehaviours allows you to reference Assets/Unity Objects easily via the inspector. 
 
