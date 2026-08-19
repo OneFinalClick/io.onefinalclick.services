@@ -132,7 +132,9 @@ public static void RegisterMyServices(ServiceCollectionBuilder builder)
 
 > Using MonoBehaviours allows you to reference Assets/Unity Objects easily via the inspector. 
 
-Create a Prefab with your services. The services should be on the **root** GameObject of the prefab.
+#### Create a **Prefab** with your services. 
+
+The services should be on the **root** GameObject of the prefab.
 ```csharp
 [RegisterAsService]
 public class MyService : MonoBehavour
@@ -151,7 +153,12 @@ public class ServiceRegister : MonoBehavour
     }
 }
 ```
-Assign the prefab in the **Project Settings** under `FinalClick > Services`
+#### Assign the prefab in the **Project Settings**
+The settinsg are under `FinalClick > Services`
+
+<img width="1232" height="428" alt="image" src="https://github.com/user-attachments/assets/6e833d4b-2ef5-4faf-aa01-dcd7e5488244" />
+
+
 
 - Any `[RegisterServices]` methods on components on the prefab will be called with the application service collection builder.
 - Any `[RegisterServiceAs(Type[])]` components on the prefab will be automatically registered.
