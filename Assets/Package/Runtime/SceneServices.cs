@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.SceneManagement;
 
 namespace FinalClick.Services
@@ -135,7 +134,7 @@ namespace FinalClick.Services
             Application.quitting += OnApplicationQuitting;
             SceneManager.sceneLoaded += OnSceneLoaded;
 #if UNITY_EDITOR
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 #endif
         }
         
@@ -144,7 +143,7 @@ namespace FinalClick.Services
             Application.quitting -= OnApplicationQuitting;
             SceneManager.sceneLoaded -= OnSceneLoaded;
 #if UNITY_EDITOR
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 #endif
         }
 
@@ -155,9 +154,9 @@ namespace FinalClick.Services
         }
         
 #if UNITY_EDITOR
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
-            if (state == PlayModeStateChange.ExitingPlayMode)
+            if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
             {
                 StopSceneServices();
                 UnbindDelegates();

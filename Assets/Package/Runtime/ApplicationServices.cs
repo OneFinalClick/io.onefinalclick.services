@@ -1,7 +1,6 @@
 using System;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEditor;
 
 namespace FinalClick.Services
 {
@@ -119,9 +118,9 @@ namespace FinalClick.Services
 
 
 #if UNITY_EDITOR
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
-            if (state == PlayModeStateChange.ExitingPlayMode)
+            if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
             {
                 Stop();
             }
@@ -132,7 +131,7 @@ namespace FinalClick.Services
         {
             Application.quitting += Stop;
 #if UNITY_EDITOR
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 #endif
         }
         
@@ -141,7 +140,7 @@ namespace FinalClick.Services
             Application.quitting -= Stop;
 
 #if UNITY_EDITOR
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 #endif
         }
     }
