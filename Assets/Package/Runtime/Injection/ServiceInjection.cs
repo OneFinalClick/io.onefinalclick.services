@@ -7,19 +7,19 @@ namespace FinalClick.Services.Injection
 {
     public static class ServiceInjection
     {
-        public static void Inject(ServiceCollection services, object injectInto)
+        public static void Inject(IServiceResolver serviceResolver, object injectInto)
         {
             IEnumerable<PropertyInfo> propertiesWithInjectAttribute = InjectionPropertyProvider.GetInjectableProperties(injectInto);
 
             foreach (var prop in propertiesWithInjectAttribute)
             {
-                InjectServiceIntoProperty(services, injectInto, prop);
+                InjectServiceIntoProperty(serviceResolver, injectInto, prop);
             }
         }
 
-        private static void InjectServiceIntoProperty(ServiceCollection services, object injectInto, PropertyInfo propertyInfo)
+        private static void InjectServiceIntoProperty(IServiceResolver serviceResolver, object injectInto, PropertyInfo propertyInfo)
         {
-            if (services.TryGet(propertyInfo.PropertyType, out object service) == false)
+            if (serviceResolver.TryGet(propertyInfo.PropertyType, out object service) == false)
             {
                 if (IsNullable(propertyInfo.PropertyType))
                 {

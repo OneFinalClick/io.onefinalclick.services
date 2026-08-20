@@ -1,106 +1,328 @@
 using System;
-using System.Collections.Generic;
+using FinalClick.Services;
+using FinalClick.Services.Injection;
 using NUnit.Framework;
+using FinalClick.Services.Injection;
 
-namespace FinalClick.Services.Editor.Tests
+namespace FinalClick.Tests.Services
 {
     public class ServiceCollectionTests
     {
-        private TestService _testService1;
-        private TestService _testService2;
-        private ServiceCollection _serviceCollection;
+        #region Test Types
 
-        [SetUp]
-        public void SetUp()
+        public interface IFooService { }
+        public interface IBarService { }
+        public interface IBazService { }
+
+        private class FooService : IService, IFooService
         {
-            _testService1 = new TestService();
-            _testService2 = new TestService();
+            public int Starts;
+            public int Updates;
+            public int Stops;
 
-            var managedServices = new List<IService> { _testService1, _testService2 };
-            var registeredServices = new Dictionary<Type, object>
-            {
-                { typeof(IService), _testService1 }
-            };
+            public void OnServiceStart() => Starts++;
+            public void OnServiceUpdate() => Updates++;
+            public void OnServiceStop() => Stops++;
+        }
 
-            _serviceCollection = new ServiceCollection(managedServices, registeredServices);
+        private class MultiService : IService, IFooService, IBarService
+        {
+            public int Starts;
+
+            public void OnServiceStart() => Starts++;
+            public void OnServiceUpdate() { }
+            public void OnServiceStop() { }
+        }
+
+        private class PlainService : IFooService { }
+
+        private class WrongService : IBazService { }
+
+        private class NeedsInjection : IService
+        {
+            [InjectService] public IFooService Foo { get; private set; }
+
+            public void OnServiceStart() { }
+            public void OnServiceUpdate() { }
+            public void OnServiceStop() { }
+        }
+
+        #endregion
+
+        // ---------------------------------------------------------------------
+        // Registration
+        // ---------------------------------------------------------------------
+
+        [Test]
+        public void Register_SingleService_RegistersInterfaceAndConcrete()
+        {
+            var builder = new ServicesCollectionBuilder();
+
+            builder.Register<IFooService, FooService>();
+
+            var services = builder.Build();
+
+            Assert.IsTrue(services.TryGet<IFooService>(out var fooInterface));
+            Assert.IsTrue(services.TryGet<FooService>(out var fooConcrete));
+
+            Assert.AreSame(fooInterface, fooConcrete);
         }
 
         [Test]
-        public void TryGet_ShouldReturnTrue_WhenServiceIsRegistered()
+        public void Register_DuplicateService_ThrowsArgumentException()
         {
-            var result = _serviceCollection.TryGet<IService>(out var service);
+            var builder = new ServicesCollectionBuilder();
 
-            Assert.IsTrue(result);
-            Assert.AreEqual(_testService1, service);
+            builder.Register<IFooService, FooService>();
+
+            Assert.Throws<ArgumentException>(() =>
+                builder.Register<IFooService, FooService>());
         }
 
         [Test]
-        public void TryGet_ShouldReturnFalse_WhenServiceIsNotRegistered()
+        public void Register_MultipleInterfaces_RegistersSameInstanceForEachInterface()
         {
-            var result = _serviceCollection.TryGet<string>(out var service);
+            var builder = new ServicesCollectionBuilder();
+            var service = new MultiService();
 
-            Assert.IsFalse(result);
-            Assert.IsNull(service);
+            builder.Register(service, typeof(IFooService), typeof(IBarService));
+
+            var services = builder.Build();
+
+            Assert.AreSame(
+                services.Get<IFooService>(),
+                services.Get<IBarService>());
+
+            Assert.AreSame(
+                service,
+                services.Get<IFooService>());
         }
 
         [Test]
-        public void Get_ShouldReturnService_WhenServiceIsRegistered()
+        public void Register_InstanceRegistration_UsesProvidedInstance()
         {
-            var service = _serviceCollection.Get<IService>();
+            var builder = new ServicesCollectionBuilder();
+            var instance = new FooService();
 
-            Assert.AreEqual(_testService1, service);
+            builder.Register<IFooService, FooService>(instance);
+
+            var services = builder.Build();
+
+            Assert.AreSame(instance, services.Get<IFooService>());
+            Assert.AreSame(instance, services.Get<FooService>());
         }
 
         [Test]
-        public void Get_ShouldThrow_WhenServiceIsNotRegistered()
+        public void Register_StaticRegistration_CreatesNewInstance()
         {
-            Assert.Throws<InvalidOperationException>(() => _serviceCollection.Get<string>());
+            var builder = new ServicesCollectionBuilder();
+
+            builder.Register<IFooService, FooService>();
+
+            var services = builder.Build();
+
+            Assert.NotNull(services.Get<IFooService>());
+            Assert.IsInstanceOf<FooService>(services.Get<IFooService>());
         }
 
         [Test]
-        public void StartServices_ShouldCallOnServiceStart_OnAllManagedServices()
+        public void Register_InvalidRegistration_ThrowsArgumentException()
         {
-            _serviceCollection.StartServices();
+            var builder = new ServicesCollectionBuilder();
 
-            Assert.IsTrue(_testService1.StartCalled);
-            Assert.IsTrue(_testService2.StartCalled);
+            Assert.Throws<ArgumentException>(() =>
+                builder.Register(new WrongService(), typeof(IFooService)));
+        }
+
+        // ---------------------------------------------------------------------
+        // Resolution
+        // ---------------------------------------------------------------------
+
+        [Test]
+        public void Resolve_Resolution_ReturnsRegisteredService()
+        {
+            var builder = new ServicesCollectionBuilder();
+            var service = new FooService();
+
+            builder.Register<IFooService, FooService>(service);
+
+            var appServices = builder.Build();
+
+            appServices.StartServices();
+
+            Assert.AreSame(service, appServices.Get<IFooService>());
+        }
+        
+        [Test]
+        public void Resolve_FallbackResolve_ReturnsInnerScopeService()
+        {
+            var appBuilder = new ServicesCollectionBuilder();
+            var appService = new FooService();
+            appBuilder.Register<IFooService, FooService>(appService);
+            var app = appBuilder.Build();
+
+            var sceneBuilder = new ServicesCollectionBuilder();
+            var sceneService = new FooService();
+            sceneBuilder.Register<IFooService, FooService>(sceneService);
+            var scene = sceneBuilder.Build();
+
+            scene.StartServices(app);
+
+            Assert.AreSame(sceneService, scene.Get<IFooService>());
         }
 
         [Test]
-        public void UpdateServices_ShouldCallOnServiceUpdate_OnAllManagedServices()
+        public void Resolve_FallbackResolve_InjectsOuterScopeService()
         {
-            _serviceCollection.StartServices();
-            _serviceCollection.UpdateServices();
+            var appBuilder = new ServicesCollectionBuilder();
+            var foo = new FooService();
+            appBuilder.Register<IFooService, FooService>(foo);
+            var app = appBuilder.Build();
 
-            Assert.IsTrue(_testService1.UpdateCalled);
-            Assert.IsTrue(_testService2.UpdateCalled);
+            var sceneBuilder = new ServicesCollectionBuilder();
+            var injected = new NeedsInjection();
+
+            sceneBuilder.Register(injected);
+
+            var scene = sceneBuilder.Build();
+
+            scene.StartServices(app);
+
+            Assert.AreSame(foo, injected.Foo);
         }
 
         [Test]
-        public void StopServices_ShouldCallOnServiceStop_OnAllManagedServices()
+        public void Resolve_MissingService_GetThrows()
         {
-            _serviceCollection.StartServices();
-            _serviceCollection.StopServices();
+            var builder = new ServicesCollectionBuilder();
+            var services = builder.Build();
 
-            Assert.IsTrue(_testService1.StopCalled);
-            Assert.IsTrue(_testService2.StopCalled);
+            Assert.Throws<InvalidOperationException>(() =>
+                services.Get<IFooService>());
         }
 
         [Test]
-        public void StopServices_ShouldNotThrow_IfServicesNotStarted()
+        public void Resolve_MissingService_TryGetReturnsFalse()
         {
-            Assert.DoesNotThrow(() => _serviceCollection.StopServices());
+            var builder = new ServicesCollectionBuilder();
+            var services = builder.Build();
+
+            Assert.IsFalse(services.TryGet<IFooService>(out _));
         }
 
-        private class TestService : IService
+        [Test]
+        public void Resolve_BeforeStartup_ServiceCanStillBeResolved()
         {
-            public bool StartCalled { get; private set; }
-            public bool UpdateCalled { get; private set; }
-            public bool StopCalled { get; private set; }
+            var builder = new ServicesCollectionBuilder();
+            var service = new FooService();
 
-            public void OnServiceStart() => StartCalled = true;
-            public void OnServiceUpdate() => UpdateCalled = true;
-            public void OnServiceStop() => StopCalled = true;
+            builder.Register<IFooService, FooService>(service);
+
+            var services = builder.Build();
+
+            Assert.IsFalse(services.IsStarted);
+            Assert.AreSame(service, services.Get<IFooService>());
+        }
+
+        // ---------------------------------------------------------------------
+        // Lifecycle
+        // ---------------------------------------------------------------------
+
+        
+        
+        [Test]
+        public void Lifecycle_StartUpdateStop_CallsServiceCallbacksExactlyOnce()
+        {
+            var builder = new ServicesCollectionBuilder();
+            var service = new FooService();
+
+            builder.Register<IFooService, FooService>(service);
+
+            var services = builder.Build();
+
+            services.StartServices();
+            services.UpdateServices();
+            services.StopServices();
+
+            Assert.AreEqual(1, service.Starts);
+            Assert.AreEqual(1, service.Updates);
+            Assert.AreEqual(1, service.Stops);
+        }
+        
+        [Test]
+        public void Lifecycle_StartUpdateStop_DoesNotCallServiceCallbacksOnOuterScopeServices()
+        {
+            var appBuilder = new ServicesCollectionBuilder();
+            var appService = new FooService();
+            appBuilder.Register<IFooService, FooService>(appService);
+            var appServices = appBuilder.Build();
+            
+            var sceneBuilder = new ServicesCollectionBuilder();
+            var sceneServices = sceneBuilder.Build();
+
+            sceneServices.StartServices(appServices);
+            sceneServices.UpdateServices();
+            sceneServices.StopServices();
+
+            Assert.AreEqual(0, appService.Starts);
+            Assert.AreEqual(0, appService.Updates);
+            Assert.AreEqual(0, appService.Stops);
+        }
+        
+        [Test]
+        public void Lifecycle_StartUpdateStop_DoesNotCallServiceCallbacksOnOuterScopeServicesWithOverride()
+        {
+            var appBuilder = new ServicesCollectionBuilder();
+            var appService = new FooService();
+            appBuilder.Register<IFooService, FooService>(appService);
+            var appServices = appBuilder.Build();
+            
+            var sceneBuilder = new ServicesCollectionBuilder();
+            var sceneService = new FooService();
+            sceneBuilder.Register<IFooService, FooService>(sceneService);
+            var sceneServices = sceneBuilder.Build();
+
+            sceneServices.StartServices(appServices);
+            sceneServices.UpdateServices();
+            sceneServices.StopServices();
+
+            Assert.AreEqual(0, appService.Starts);
+            Assert.AreEqual(0, appService.Updates);
+            Assert.AreEqual(0, appService.Stops);
+            
+            Assert.AreEqual(1, sceneService.Starts);
+            Assert.AreEqual(1, sceneService.Updates);
+            Assert.AreEqual(1, sceneService.Stops);
+        }
+
+        [Test]
+        public void Lifecycle_StopBeforeStart_DoesNothing()
+        {
+            var builder = new ServicesCollectionBuilder();
+            var service = new FooService();
+
+            builder.Register<IFooService, FooService>(service);
+
+            var services = builder.Build();
+
+            services.StopServices();
+
+            Assert.AreEqual(0, service.Stops);
+        }
+
+        [Test]
+        public void Lifecycle_ServiceRegisteredMultipleInterfaces_StartsOnlyOnce()
+        {
+            var builder = new ServicesCollectionBuilder();
+            var service = new MultiService();
+
+            builder.Register(service, typeof(IFooService), typeof(IBarService));
+
+            var services = builder.Build();
+
+            services.StartServices();
+
+            Assert.AreEqual(1, service.Starts);
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using FinalClick.Services.Attributes;
 using JetBrains.Annotations;
@@ -17,12 +16,6 @@ namespace FinalClick.Services
         public ServiceCollection Build()
         {
             return new ServiceCollection(_managedServices, _registeredServices);
-        }
-        
-        public void RunStaticRegisterFunctions()
-        {
-            var methods = RegisterServicesAttribute.GetAllStaticRegisterServicesMethods();
-            InvokeRegisterMethods(methods);
         }
 
         public void RegisterGameObject(GameObject gameObject)
@@ -43,15 +36,14 @@ namespace FinalClick.Services
             RegisterAnyRegisterAsServiceMonoBehaviours(allComponents);
         }
 
-
-        private void InvokeRegisterMethods(IEnumerable<MethodInfo> methods, object instance = null)
+        internal void InvokeRegisterMethods(IEnumerable<MethodInfo> methods, object instance = null)
         {
             foreach (MethodInfo method in methods)
             {
                 InvokeRegisterMethod(method, instance);
             }
         }
-        
+
         private void InvokeRegisterMethod(MethodInfo method, object instance = null)
         {
             if (RegisterServicesAttribute.IsMethodValid(method) == false)
@@ -137,12 +129,14 @@ namespace FinalClick.Services
         [UsedImplicitly]
         public void Register<TI, T>(T service) where T : TI
         {
+            // ReSharper disable once HeapView.PossibleBoxingAllocation
             Register(service, typeof(TI), typeof(T));
         }
         
         [UsedImplicitly]
         public void Register<T>(T service)
         {
+            // ReSharper disable once HeapView.PossibleBoxingAllocation
             Register(service, typeof(T));
         }
 

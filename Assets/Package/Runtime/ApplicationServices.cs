@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using FinalClick.Services.Attributes;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -16,14 +19,15 @@ namespace FinalClick.Services
         {
             return IsStarted;
         }
-        
+
         internal static void StartFromGameObject(GameObject gameObject)
         {
             Debug.Assert(IsStarted == false, "Services already started");
             
             ServicesCollectionBuilder builder = new();
 
-            builder.RunStaticRegisterFunctions();
+            IEnumerable<MethodInfo> methods = RegisterServicesAttribute.GetAllStaticRegisterServicesMethods();
+            builder.InvokeRegisterMethods(methods);
             builder.RegisterGameObject(gameObject);
             
             _serviceCollection = builder.Build();
@@ -65,7 +69,7 @@ namespace FinalClick.Services
                 return false;
             }
             
-            return _serviceCollection.TryGet(out service);
+            return _serviceCollection.TryGet<TI>(out service);
         }
 
         [UsedImplicitly]
@@ -86,8 +90,6 @@ namespace FinalClick.Services
             
             Debug.Log("Started application services.");
         }
-        
-
         
         private static void UpdateServices()
         {
@@ -115,7 +117,6 @@ namespace FinalClick.Services
         {
             BindDelegates();
         }
-
 
 #if UNITY_EDITOR
         private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)

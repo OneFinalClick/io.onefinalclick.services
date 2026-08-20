@@ -28,7 +28,7 @@ namespace FinalClick.Services
         {
             Debug.Assert(scene.IsValid() == true, "Scene is not valid");
 
-            if (_sceneServices.TryGetValue(scene, out var services) == false)
+            if (_sceneServices.TryGetValue(scene, out ServiceCollection services) == false)
             {
                 service = default;
                 return false;
@@ -42,7 +42,7 @@ namespace FinalClick.Services
         {
             Debug.Assert(scene.IsValid() == true, "Scene is not valid");
 
-            if (_sceneServices.TryGetValue(scene, out var services) == false)
+            if (_sceneServices.TryGetValue(scene, out ServiceCollection services) == false)
             {
                 throw new ArgumentException("Scene is not loaded", nameof(scene));
             }
