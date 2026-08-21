@@ -2,11 +2,10 @@ using System;
 using FinalClick.Services;
 using FinalClick.Services.Injection;
 using NUnit.Framework;
-using FinalClick.Services.Injection;
 
 namespace FinalClick.Tests.Services
 {
-    public class ServiceCollectionTests
+    public partial class ServiceCollectionTests
     {
         #region Test Types
 
@@ -38,18 +37,13 @@ namespace FinalClick.Tests.Services
 
         private class WrongService : IBazService { }
 
-        private class NeedsInjection : IService, IServiceInjectable
+        public partial class NeedsInjection : IService
         {
             [InjectService] public IFooService Foo { get; private set; }
 
             public void OnServiceStart() { }
             public void OnServiceUpdate() { }
             public void OnServiceStop() { }
-
-            public void InjectServices(IServiceResolver serviceResolver)
-            {
-                Foo = serviceResolver.Get<IFooService>();
-            }
         }
 
         #endregion
