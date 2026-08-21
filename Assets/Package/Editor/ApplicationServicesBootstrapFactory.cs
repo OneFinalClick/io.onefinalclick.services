@@ -12,16 +12,11 @@ namespace FinalClick.Services.Editor
 
             GameObject servicesInstance = usePrefab ? Object.Instantiate(servicesPrefab) : new GameObject("Application Services");
 
-            AddSavedServicesToApplicationServices(servicesInstance);
             SetGameObjectAsApplicationServices(servicesInstance);
             
             return servicesInstance;
         }
 
-        private static void AddSavedServicesToApplicationServices(GameObject gameObject)
-        {
-            gameObject.AddComponent<RegisterNoneMonoBehaviourApplicationServices>();
-        }
         
         private static void SetGameObjectAsApplicationServices(GameObject gameObject)
         {

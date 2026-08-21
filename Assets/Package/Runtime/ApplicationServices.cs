@@ -13,25 +13,34 @@ namespace FinalClick.Services
         private static bool IsStarted => _serviceCollection != null && _serviceCollection.IsStarted;
         internal static ServiceCollection ServiceCollection => _serviceCollection;
 
-        public static event Action OnBuildApplicationServicesEvent;
+        private static readonly List<Action<ServicesCollectionBuilder>> RegisteredBuilderFunctions = new();
+
+        public static void AddApplicationServicesBuilderFunction(Action<ServicesCollectionBuilder> registration)
+        {
+            Debug.Assert(registration != null, "provided function is null.");
+            RegisteredBuilderFunctions.Add(registration);
+        }
 
         public static bool HasStarted()
         {
             return IsStarted;
         }
-
+        
         internal static void StartFromGameObject(GameObject gameObject)
         {
             Debug.Assert(IsStarted == false, "Services already started");
             
             ServicesCollectionBuilder builder = new();
 
+            foreach (var generatedRegistrationBuilderFunction in RegisteredBuilderFunctions)
+            {
+                generatedRegistrationBuilderFunction?.Invoke(builder);
+            }
             IEnumerable<MethodInfo> methods = RegisterServicesAttribute.GetAllStaticRegisterServicesMethods();
             builder.InvokeRegisterMethods(methods);
             builder.RegisterGameObject(gameObject);
             
             _serviceCollection = builder.Build();
-            OnBuildApplicationServicesEvent?.Invoke();
             StartServices();
         }
 

@@ -139,6 +139,14 @@ namespace FinalClick.Services
             // ReSharper disable once HeapView.PossibleBoxingAllocation
             Register(service, typeof(T));
         }
+        
+                
+        [UsedImplicitly]
+        public void Register<T>() where T : new()
+        {
+            // ReSharper disable once HeapView.PossibleBoxingAllocation
+            Register(new T(), typeof(T));
+        }
 
         public void RegisterSceneServices(Scene scene)
         {

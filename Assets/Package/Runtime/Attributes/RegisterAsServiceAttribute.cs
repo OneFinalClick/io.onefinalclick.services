@@ -38,7 +38,5 @@ namespace FinalClick.Services.Attributes
             
             return methods;
         }
-
-        
     }
 }
