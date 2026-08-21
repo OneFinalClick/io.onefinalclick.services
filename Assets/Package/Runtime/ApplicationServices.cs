@@ -36,8 +36,6 @@ namespace FinalClick.Services
             {
                 generatedRegistrationBuilderFunction?.Invoke(builder);
             }
-            IEnumerable<MethodInfo> methods = RegisterServicesAttribute.GetAllStaticRegisterServicesMethods();
-            builder.InvokeRegisterMethods(methods);
             builder.RegisterGameObject(gameObject);
             
             _serviceCollection = builder.Build();

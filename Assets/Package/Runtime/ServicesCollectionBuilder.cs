@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using FinalClick.Services.Attributes;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,74 +25,13 @@ namespace FinalClick.Services
                 RegisterManaged(service);
             }
             
-            MonoBehaviour[] allComponents = gameObject.GetComponents<MonoBehaviour>();
-            foreach (MonoBehaviour component in allComponents)
+            IServiceRegisterer[] allComponents = gameObject.GetComponents<IServiceRegisterer>();
+            foreach (IServiceRegisterer component in allComponents)
             {
-                RunRegisterFunctionsOnMonoBehaviour(component);
-            }
-            
-            RegisterAnyRegisterAsServiceMonoBehaviours(allComponents);
-        }
-
-        internal void InvokeRegisterMethods(IEnumerable<MethodInfo> methods, object instance = null)
-        {
-            foreach (MethodInfo method in methods)
-            {
-                InvokeRegisterMethod(method, instance);
+                component.RegisterServices(this);
             }
         }
 
-        private void InvokeRegisterMethod(MethodInfo method, object instance = null)
-        {
-            if (RegisterServicesAttribute.IsMethodValid(method) == false)
-            {
-                Debug.LogError($"Method {method.DeclaringType!.FullName}.{method.Name} marked with [{nameof(RegisterServicesAttribute)}] does not have the correct signature. Expected: static void Method(ServicesCollectionBuilder builder)");
-            }
-
-            method.Invoke(instance, new object[] { this });
-        }
-
-        private void RunRegisterFunctionsOnMonoBehaviour(MonoBehaviour monoBehaviour)
-        {
-            var methods = RegisterAsServiceAttribute.GetAllAutoRegisterServicesInstanceMethods(monoBehaviour);
-            InvokeRegisterMethods(methods, monoBehaviour);
-        }
-        
-        private void RegisterAnyRegisterAsServiceMonoBehaviours(MonoBehaviour[] allComponents)
-        {
-            foreach (var component in allComponents)
-            {
-                TryAutoRegisterAsService(component);
-            }
-        }
-        
-        private bool TryAutoRegisterAsService(MonoBehaviour monoBehaviour)
-        {
-            // Can be null if "The references scripted on this Behaviour (Unknown) is missing!" warnings.
-            if (monoBehaviour == null)
-            {
-                return false;
-            }
-            
-            RegisterAsServiceAttribute attribute = monoBehaviour.GetType().GetCustomAttribute(typeof(RegisterAsServiceAttribute), false) as RegisterAsServiceAttribute;
-
-            if (attribute == null)
-            {
-                return false;
-            }
-
-            if (attribute.RegisterSelfAsServiceType == true)
-            {
-                Register(monoBehaviour, monoBehaviour.GetType());
-            }
-            else
-            {
-                Register(monoBehaviour, attribute.RegisterTypes);
-            }
-            return true;
-        }
-
- 
         [UsedImplicitly]
         public void Register(object service, params Type[] types)
         {
