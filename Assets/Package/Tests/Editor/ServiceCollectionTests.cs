@@ -38,13 +38,18 @@ namespace FinalClick.Tests.Services
 
         private class WrongService : IBazService { }
 
-        private class NeedsInjection : IService
+        private class NeedsInjection : IService, IServiceInjectable
         {
             [InjectService] public IFooService Foo { get; private set; }
 
             public void OnServiceStart() { }
             public void OnServiceUpdate() { }
             public void OnServiceStop() { }
+
+            public void InjectServices(IServiceResolver serviceResolver)
+            {
+                Foo = serviceResolver.Get<IFooService>();
+            }
         }
 
         #endregion

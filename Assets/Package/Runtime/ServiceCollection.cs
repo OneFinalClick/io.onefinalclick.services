@@ -58,7 +58,7 @@ namespace FinalClick.Services
             {
                 try
                 {
-                    ServiceInjection.Inject(serviceResolver, service);
+                    ServiceInjection.TryInject(serviceResolver, service);
                 }
                 catch (Exception e)
                 {
