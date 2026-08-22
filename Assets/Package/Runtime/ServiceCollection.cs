@@ -104,6 +104,8 @@ namespace FinalClick.Services
             {
                 return;
             }
+
+            _isStarted = false;
             
             foreach (IService service in _managedServices)
             {
