@@ -68,7 +68,7 @@ Within a Service you can use the `[InjectService]` attribute on a property or fi
 public class ExampleComponent : MonoBehavour
 {
     [InjectService] 
-    private IMyService MyService { get; } = null;
+    private IMyService MyService { get; private set; }
     
     // ...
 }
