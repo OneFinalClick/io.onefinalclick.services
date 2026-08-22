@@ -21,6 +21,14 @@ or this:
 ```csharp
 GameManager gameManager = gameObject.GetService<GameManager>();
 ```
+
+or, within other services, auto injection like this:
+
+```csharp
+[InjectService]
+GameManager _gamemanager;
+```
+
 ---
 
 ## Overview
@@ -31,12 +39,12 @@ GameManager gameManager = gameObject.GetService<GameManager>();
 
 ## Features
 
-- 🔍 **Automatic Service Discovery** via `RegisterServices` and `RegisterAsService` attributes.
+- 🔍 **Automatic Service Discovery** via `ApplicationService` and `MonoBehaviourService` attributes.
 - 🧩 ***Automatic Dependency Injection** via the `InjectService` property attribute.
 - 💡 **Application Scoped Services** via `ApplicationServices`.
 - 🎬 **Scene Scoped Services** via `SceneServices`.
 - ⚙️ **Lifecycle Hooks** via the `IService` interface. (`OnServiceStart`, `OnServiceUpdate`, `OnServiceStop`)
-- 🚀 **Disable Domain Reload Support**: automatic start and stops services during scene load and unload, and when entering or exiting Play Mode.
+- 🚀 **Disable Domain Reload Support**: Automaticly start and stops services during scene load and unload, and when entering or exiting Play Mode.
 
 > *Automatic Dependency Injection can only be used within service
 ---
@@ -53,10 +61,10 @@ GameManager gameManager = gameObject.GetService<GameManager>();
                 └─ ApplicationServices.Get<T>()
 ```
 
-Within a Service you can use the `[InjectService]` attribute on a property
+Within a Service you can use the `[InjectService]` attribute on a property or field.
 
 ```csharp
-[RegisterAsService]
+[MonoBehaviourService]
 public class ExampleComponent : MonoBehavour
 {
     [InjectService] 
@@ -66,7 +74,7 @@ public class ExampleComponent : MonoBehavour
 }
 ```
 
-The service will be injected into the backing field of the property.
+The service will be set before the services start
 
 > Note, the `InjectService` attribute can only be used if the **MonoBehaviour** or csharp **class** is a registered service.
 
@@ -112,58 +120,70 @@ This can be called anywhere and requires no references to any Unity Object
 
 ### Registering Pure C# Services
 
-To register services at the application scope create a static method marked with the `[RegisterServices]` attribute.
-
-Example:
+#### Automatically 
+To automatically create an instance of a service and register it as an application service, use the `[ApplicationService]` attribute.
 
 ```csharp
-[RegisterServices]
-public static void RegisterMyServices(ServiceCollectionBuilder builder)
+[ApplicationService]
+public class MyService
 {
-    builder.Register<IMyService, MyService>();
+    //...
 }
 ```
+#### Manually
 
-- The method must be `static`.
-- It must accept exactly **one parameter**: `ServiceCollectionBuilder`.
-- These methods are automatically called **before the first scene is loaded**.
+If you need complex constructions, such as none default constructors, you can create a function to create the application service:
+
+```csharp
+public static void RegisterApplicationServices( ServicesCollectionBuilder builder)
+{
+    builder.Register<MyService>();
+}
+```
+and then register that function with ApplicationServices:
+
+```csharp
+[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+private static void RegisterApplicationServices()
+{ 
+    ApplicationServices.AddApplicationServicesBuilderFunction(RegisterApplicationServices);
+}
+```
 
 ### Registering MonoBehaviour Services
 
 > Using MonoBehaviours allows you to reference Assets/Unity Objects easily via the inspector. 
 
-#### Create a **Prefab** with your services. 
+#### Assign a prefab in the **Project Settings**
+The settings are under `FinalClick > Services`
 
-The services should be on the **root** GameObject of the prefab.
+<img width="1232" height="428" alt="image" src="https://github.com/user-attachments/assets/6e833d4b-2ef5-4faf-aa01-dcd7e5488244" />
+
+This prefab will be automatically instantiated into the first scene that's loaded.
+
+#### Registering MonoBehaviour Services
+
+Any **root* MonoBehaviours on the Application Services Prefab with the attribute `[MonoBehaviourService]`, or a `IServiceRegisterer` implementation, can be used to register application services.
+
 ```csharp
-[RegisterAsService]
+[MonoBehaviourService]
 public class MyService : MonoBehavour
 {
     ///
 }
 ```
+
 or
+
 ```csharp
-public class ServiceRegister : MonoBehavour
+public class MyService : MonoBehavour, IServiceRegisterer
 {
-    [RegisterServices]
-    private void MyRegisterFunction(ServiceCollectionBuilder builder)
+    public void RegisterServices(ServiceCollectionBuilder builder)
     {
-        builder.Register<OtherService>(OtherService);
+        builder.Register<MyService>(this);
     }
 }
 ```
-#### Assign the prefab in the **Project Settings**
-The settinsg are under `FinalClick > Services`
-
-<img width="1232" height="428" alt="image" src="https://github.com/user-attachments/assets/6e833d4b-2ef5-4faf-aa01-dcd7e5488244" />
-
-
-
-- Any `[RegisterServices]` methods on components on the prefab will be called with the application service collection builder.
-- Any `[RegisterServiceAs(Type[])]` components on the prefab will be automatically registered.
-
-This prefab will be automatically instantiated into the first scene that's loaded.
 
 > Note, at build time this prefab is instantiated into the first scene. This causes it to be unpacked and baked at build time so there is no instantiation costs in builds.
 
@@ -171,16 +191,16 @@ This prefab will be automatically instantiated into the first scene that's loade
 
 ## ⚙️ Scene Service Registration
 
-Scene services can be registered via MonoBehaviours. However, the MonoBehaviour services must be on a **root** GameObject in the scene.
+Scene services can be pure csharp classes or `MonoBehaviours`. However, they can **only** be registered via MonoBehaviours. MonoBehaviourServices, or registerers, must be on a **root** GameObject in the scene to be found.
 
-1. Any `[RegisterServices]` methods on a **root** GameObjects MonoBehaviour will be called on scene load. 
-2. Any `[RegisterAsService]` MonoBehaviours, which are also on **roo** GameObjects, will be registered on scene load
+1. Any **root** MonoBehaviour components of a type with the attribute `[MonoBehaviourService]` will be registered.
+2. Any **root** MonoBehaviour components that implement `IServiceRegisterer` will have their `IServiceRegisterer.RegisterServices` function invoked during scene service registration.
 
 ---
 
 ## Service Lifecycle (`IService`)
 
-For services that need structured startup, update, and shutdown behavior, implement the `IService` interface:
+For services that need structured startup, update, and shutdown behaviour, implement the `IService` interface:
 
 ```csharp
 namespace FinalClick.Services
