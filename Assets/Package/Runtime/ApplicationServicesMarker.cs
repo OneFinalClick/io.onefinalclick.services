@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace FinalClick.Services
 {
+    /// <summary>
+    /// This will be ran really early in the initial to register all application services.
+    /// </summary>
     [DefaultExecutionOrder(-1000)]
     internal class ApplicationServicesMarker : MonoBehaviour
     {

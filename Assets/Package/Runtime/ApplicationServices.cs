@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using FinalClick.Services.Attributes;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -34,7 +32,14 @@ namespace FinalClick.Services
 
             foreach (var generatedRegistrationBuilderFunction in RegisteredBuilderFunctions)
             {
-                generatedRegistrationBuilderFunction?.Invoke(builder);
+                try
+                {
+                    generatedRegistrationBuilderFunction?.Invoke(builder);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
             builder.RegisterGameObject(gameObject);
             
@@ -56,13 +61,13 @@ namespace FinalClick.Services
 
         private static void Stop()
         {
+            Application.quitting -= Stop;
+            
             if (IsStarted == false)
             {
                 return;
             }
             
-            UnbindDelegates();
-
             StopServices();
             _serviceCollection = null;
         }
@@ -89,6 +94,8 @@ namespace FinalClick.Services
         {
             Debug.Assert(IsStarted == false, "Services already started");
             
+            Application.quitting += Stop;
+            
             Debug.Log("Starting application services...");
             
             ApplicationServicesUpdater.EnsureHasUpdater();
@@ -114,42 +121,6 @@ namespace FinalClick.Services
             _serviceCollection.StopServices();
             
             Debug.Log("Stopped application services.");
-        }
-
-        // Ensure stop is called when exiting playmode or closing the application.
-        // -----------------------------------------------------------------------
-        
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void EnsureApplicationServicesUnregistersOnExit()
-        {
-            BindDelegates();
-        }
-
-#if UNITY_EDITOR
-        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
-        {
-            if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
-            {
-                Stop();
-            }
-        }
-#endif
-        
-        private static void BindDelegates()
-        {
-            Application.quitting += Stop;
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-#endif
-        }
-        
-        private static void UnbindDelegates()
-        {
-            Application.quitting -= Stop;
-
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-#endif
         }
     }
 }

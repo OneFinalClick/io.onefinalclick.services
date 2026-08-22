@@ -11,7 +11,7 @@ namespace FinalClick.Services.Editor
 
         public void OnProcessScene(Scene scene, BuildReport report)
         {
-            // ApplicationServivcesEditorInitializer handles in editor, as it needs to be created before the awake of other objects.
+            // ApplicationServicesEditorInitializer handles in editor, as it needs to be created before the awake of other objects.
             if(Application.isPlaying == true)
             {
                 return;

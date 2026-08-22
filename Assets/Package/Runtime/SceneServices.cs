@@ -26,12 +26,9 @@ namespace FinalClick.Services
         [UsedImplicitly]
         public static bool TryGet<TI>(Scene scene, out TI service)
         {
-            Debug.Assert(scene.IsValid() == true, "Scene is not valid");
-
-            if (_sceneServices.TryGetValue(scene, out ServiceCollection services) == false)
+            if (scene.IsValid() == false || _sceneServices.TryGetValue(scene, out ServiceCollection services) == false)
             {
-                service = default;
-                return false;
+                return ApplicationServices.TryGet<TI>(out service);
             }
             
             return services.TryGet(out service);
@@ -40,14 +37,12 @@ namespace FinalClick.Services
         [UsedImplicitly]
         public static TI Get<TI>(Scene scene)
         {
-            Debug.Assert(scene.IsValid() == true, "Scene is not valid");
-
-            if (_sceneServices.TryGetValue(scene, out ServiceCollection services) == false)
+            if (scene.IsValid() == true && _sceneServices.TryGetValue(scene, out ServiceCollection services) == true)
             {
-                throw new ArgumentException("Scene is not loaded", nameof(scene));
+                return services.Get<TI>();
             }
 
-            return services.Get<TI>();
+            return ApplicationServices.Get<TI>();
         }
 
         public static void StartServicesForScene(Scene scene)
@@ -63,8 +58,7 @@ namespace FinalClick.Services
             
             // Create a gameobject in the scene created, and then add a scene stopper.
             GameObject stopped = new GameObject("SceneServiceStopper");
-            stopped.transform.SetParent(scene.GetRootGameObjects()[0].transform);
-            stopped.transform.parent = null;
+            SceneManager.MoveGameObjectToScene(stopped, scene);
             stopped.AddComponent<SceneServiceStopper>();
             stopped.transform.SetAsFirstSibling();
             
@@ -103,25 +97,17 @@ namespace FinalClick.Services
             Debug.Log($"Stopped services for scene: {scene.name}({scene.handle})");
         }
 
-        private static IReadOnlyList<MonoBehaviour> GetRootMonoBehaviours(Scene scene)
-        {
-            List<MonoBehaviour> rootMonos = new();
-            foreach (var go in scene.GetRootGameObjects())
-            {
-                rootMonos.AddRange(go.GetComponents<MonoBehaviour>());
-            }
-            
-            return rootMonos;
-        }
-
-
-        // Ensure stop is called when exiting playmode or closing the application.
-        // -----------------------------------------------------------------------
-        
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void EnsureApplicationServicesUnregistersOnExit()
         {
+            Application.quitting += OnApplicationQuitting;
             BindDelegates();
+        }
+
+        private static void OnApplicationQuitting()
+        {
+            Application.quitting -= OnApplicationQuitting;
+            UnbindDelegates();
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode _)
@@ -131,38 +117,12 @@ namespace FinalClick.Services
 
         private static void BindDelegates()
         {
-            Application.quitting += OnApplicationQuitting;
             SceneManager.sceneLoaded += OnSceneLoaded;
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-#endif
         }
         
         private static void UnbindDelegates()
         {
-            Application.quitting -= OnApplicationQuitting;
             SceneManager.sceneLoaded -= OnSceneLoaded;
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-#endif
         }
-
-        private static void OnApplicationQuitting()
-        {
-            StopSceneServices();
-            UnbindDelegates();
-        }
-        
-#if UNITY_EDITOR
-        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
-        {
-            if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode)
-            {
-                StopSceneServices();
-                UnbindDelegates();
-            }
-        }
-#endif
-
     }
 }

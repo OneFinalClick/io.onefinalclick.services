@@ -13,6 +13,7 @@ namespace FinalClick.Services
         private readonly IReadOnlyList<IService> _managedServices;
         private readonly IReadOnlyDictionary<Type, object> _registeredServices;
         private bool _isStarted = false;
+        private IServiceResolver _outerScopeResolver;
 
         public ServiceCollection(IReadOnlyList<IService> managedServices, IReadOnlyDictionary<Type, object> registeredServices)
         {
@@ -22,12 +23,19 @@ namespace FinalClick.Services
 
         public bool TryGet(Type type, out object service)
         {
-            return _registeredServices.TryGetValue(type, out service);
+            if (_registeredServices.TryGetValue(type, out service) == true)
+            {
+                return true;
+            }
+            
+            return _outerScopeResolver.TryGet(type, out service);
         }
         
-        public void StartServices(ServiceCollection outerScopeServices = null)
+        public void StartServices(ServiceCollection outerScopeServiceResolver = null)
         {
-            InjectServices(outerScopeServices);
+            _outerScopeResolver = outerScopeServiceResolver;
+            IServiceResolver serviceResolver = outerScopeServiceResolver != null ? this.CreateResolverWithFallback(outerScopeServiceResolver) : this;
+            InjectServices(serviceResolver);
             
             Debug.Assert(_isStarted == false, "Services already started");
 
@@ -46,14 +54,13 @@ namespace FinalClick.Services
             }
         }
         
-        private void InjectServices(IServiceResolver serviceResolver = null)
+        private void InjectServices(IServiceResolver serviceResolver)
         {
             Debug.Log("Injecting services...");
+            Debug.Assert(serviceResolver != null, "Service resolver not started");
 
             var services =  _registeredServices.Values.Distinct();
 
-            serviceResolver = serviceResolver != null ? this.CreateResolverWithFallback(serviceResolver) : this;
-            
             foreach (var service in services)
             {
                 try

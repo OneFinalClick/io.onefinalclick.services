@@ -15,19 +15,8 @@ namespace FinalClick.Services
                 service = default;
                 return false;
             }
-            
-            if (SceneServices.TryGet<T>(gameObject.scene, out service) == true)
-            {
-                return true;
-            }
 
-            // Fall back to application scope if scene doesnt have that service.
-            if (ApplicationServices.TryGet<T>(out service) == true)
-            {
-                return true;
-            }
-
-            return false;
+            return SceneServices.TryGet<T>(gameObject.scene, out service);
         }
 
         [UsedImplicitly]

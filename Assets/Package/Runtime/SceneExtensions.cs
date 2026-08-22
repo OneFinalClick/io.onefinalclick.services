@@ -1,6 +1,5 @@
 using System;
 using JetBrains.Annotations;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace FinalClick.Services
@@ -10,18 +9,7 @@ namespace FinalClick.Services
         [UsedImplicitly]
         public static bool TryGetService<T>(this Scene scene, out T service)
         {
-            if (SceneServices.TryGet<T>(scene, out service) == true)
-            {
-                return true;
-            }
-
-            // Fall back to application scope if scene doesnt have that service.
-            if (ApplicationServices.TryGet<T>(out service) == true)
-            {
-                return true;
-            }
-
-            return false;
+            return SceneServices.TryGet<T>(scene, out service);
         }
 
         [UsedImplicitly]

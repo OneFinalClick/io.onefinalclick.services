@@ -7,9 +7,9 @@ namespace FinalClick.Services.Editor
     {
         internal static GameObject Create()
         {
-            // Create from prefab in settings, or make blank gameobject.
+            // Create instance of from prefab set in settings,
+            // if none set, just make an empty GameObject instead
             bool usePrefab = ProjectSettingsDatabase.Get<ServicesProjectSettings>().TryGetServicesPrefab(out GameObject servicesPrefab);
-
             GameObject servicesInstance = usePrefab ? Object.Instantiate(servicesPrefab) : new GameObject("Application Services");
 
             SetGameObjectAsApplicationServices(servicesInstance);
