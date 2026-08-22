@@ -27,8 +27,13 @@ namespace FinalClick.Services
             {
                 return true;
             }
-            
-            return _outerScopeResolver.TryGet(type, out service);
+
+            if (_outerScopeResolver != null)
+            {
+                return _outerScopeResolver.TryGet(type, out service);
+            }
+
+            return false;
         }
         
         public void StartServices(ServiceCollection outerScopeServiceResolver = null)
