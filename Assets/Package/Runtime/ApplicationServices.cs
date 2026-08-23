@@ -117,6 +117,7 @@ namespace FinalClick.Services
             Debug.Assert(IsStarted == true, "Services not started");
             Debug.Log("Stopping application services...");
 
+            RegisteredBuilderFunctions.Clear();
             SceneServices.StopSceneServices();
             _serviceCollection.StopServices();
             

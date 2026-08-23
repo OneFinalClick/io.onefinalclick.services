@@ -56,12 +56,6 @@ namespace FinalClick.Services
             var services = builder.Build();
             _sceneServices.Add(scene, services);
             
-            // Create a gameobject in the scene created, and then add a scene stopper.
-            GameObject stopped = new GameObject("SceneServiceStopper");
-            SceneManager.MoveGameObjectToScene(stopped, scene);
-            stopped.AddComponent<SceneServiceStopper>();
-            stopped.transform.SetAsFirstSibling();
-            
             services.StartServices(ApplicationServices.ServiceCollection);
             Debug.Log($"Started services for scene: {scene.name}({scene.handle})");
         }
@@ -94,10 +88,10 @@ namespace FinalClick.Services
             
             services.StopServices();
             _sceneServices.Remove(scene);
-            Debug.Log($"Stopped services for scene: {scene.name}({scene.handle})");
+           Debug.Log($"Stopped services for scene: {scene.name}({scene.handle})");
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void EnsureApplicationServicesUnregistersOnExit()
         {
             Application.quitting += OnApplicationQuitting;
@@ -115,14 +109,21 @@ namespace FinalClick.Services
             StartServicesForScene(scene);
         }
 
+        private static void OnSceneUnloaded(Scene scene)
+        {
+            StopServicesForScene(scene);
+        }
+
         private static void BindDelegates()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
-        
+
         private static void UnbindDelegates()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
         }
     }
 }
