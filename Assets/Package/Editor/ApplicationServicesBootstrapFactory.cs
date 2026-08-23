@@ -1,4 +1,5 @@
 using FinalClick.ProjectSettings;
+using FinalClick.ProjectSettings.Editor;
 using UnityEngine;
 
 namespace FinalClick.Services.Editor
@@ -9,7 +10,7 @@ namespace FinalClick.Services.Editor
         {
             // Create instance of from prefab set in settings,
             // if none set, just make an empty GameObject instead
-            bool usePrefab = ProjectSettingsDatabase.Get<ServicesProjectSettings>().TryGetServicesPrefab(out GameObject servicesPrefab);
+            bool usePrefab = ProjectSettingsEditorDatabase.GetOrCreateDefault<ServicesProjectSettings>().TryGetServicesPrefab(out GameObject servicesPrefab);
             GameObject servicesInstance = usePrefab ? Object.Instantiate(servicesPrefab) : new GameObject("Application Services");
 
             SetGameObjectAsApplicationServices(servicesInstance);

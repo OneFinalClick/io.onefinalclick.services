@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FinalClick.Services
 {
-    [ProjectSettings(fileName:"FinalClickServiceSettings", settingsProviderDirectory:"FinalClick", settingsProviderName:"Services")]
+    [ProjectSettings(fileName:"FinalClickServiceSettings", settingsProviderDirectory:"FinalClick", settingsProviderName:"Services", editorOnly: true)]
     public class ServicesProjectSettings : ScriptableObject
     {
         [SerializeField]
