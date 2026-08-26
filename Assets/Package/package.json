@@ -15,6 +15,6 @@
     "unity": "6000.0",
     "description": "A lightweight service registration and dependency access framework for Unity.",
     "dependencies": {
-        "io.finalclick.projectsettings": "1.0.0"
+        "io.onefinalclick.projectsettings": "1.0.0"
     }
 }
