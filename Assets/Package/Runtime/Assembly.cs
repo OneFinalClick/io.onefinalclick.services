@@ -1,4 +1,4 @@
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("FinalClick.Services.Editor")]
-[assembly:InternalsVisibleTo("FinalClick.Services.Tests")]
+[assembly:InternalsVisibleTo("OneFinalClick.Services.Editor")]
+[assembly:InternalsVisibleTo("OneFinalClick.Services.Tests")]

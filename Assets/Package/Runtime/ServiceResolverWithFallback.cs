@@ -1,6 +1,6 @@
 using System;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     internal class ServiceResolverWithFallback : IServiceResolver
     {

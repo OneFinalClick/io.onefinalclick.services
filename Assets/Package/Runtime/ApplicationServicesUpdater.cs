@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     // -1 to gaurantee services are updated before all other components by default.
     [DefaultExecutionOrder(-1)]

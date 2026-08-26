@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     public static class SceneServices
     {

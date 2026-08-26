@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace FinalClick.Services.Tests.Runtime
+namespace OneFinalClick.Services.Tests.Runtime
 {
     public class ApplicationServicesTests
     {

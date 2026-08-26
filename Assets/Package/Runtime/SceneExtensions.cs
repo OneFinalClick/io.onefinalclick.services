@@ -2,7 +2,7 @@ using System;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     public static class SceneExtensions
     {

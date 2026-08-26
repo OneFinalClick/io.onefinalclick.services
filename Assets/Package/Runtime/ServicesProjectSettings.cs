@@ -1,9 +1,9 @@
-using FinalClick.ProjectSettings;
+using OneFinalClick.ProjectSettings;
 using UnityEngine;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
-    [ProjectSettings(fileName:"ServiceProjectSettings", fileDirectory:"FinalClick", settingsProviderDirectory:"FinalClick", settingsProviderName:"Services", editorOnly: true)]
+    [ProjectSettings(fileName:"ServiceProjectSettings", fileDirectory:"OneFinalClick", settingsProviderDirectory:"OneFinalClick", settingsProviderName:"Services", editorOnly: true)]
     public class ServicesProjectSettings : ScriptableObject
     {
         [SerializeField]

@@ -1,6 +1,6 @@
 using System;
 
-namespace FinalClick.Services.Attributes
+namespace OneFinalClick.Services.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class ApplicationServiceAttribute : Attribute

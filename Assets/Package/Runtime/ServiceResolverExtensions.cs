@@ -1,6 +1,6 @@
 using System;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     public static class ServiceResolverExtensions
     {

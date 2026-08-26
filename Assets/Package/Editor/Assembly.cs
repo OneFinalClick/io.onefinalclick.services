@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("FinalClick.Services.Tests")]
+[assembly:InternalsVisibleTo("OneFinalClick.Services.Tests")]

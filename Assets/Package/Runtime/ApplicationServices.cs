@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     public static class ApplicationServices
     {

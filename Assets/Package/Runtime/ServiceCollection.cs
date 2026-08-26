@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FinalClick.Services.Injection;
+using OneFinalClick.Services.Injection;
 using UnityEngine;
 
-namespace FinalClick.Services
+namespace OneFinalClick.Services
 {
     public class ServiceCollection : IServiceResolver
     {

@@ -1,10 +1,10 @@
 {
-    "name": "FinalClick.Services.Editor",
-    "rootNamespace": "FinalClick.Services.Editor",
+    "name": "OneFinalClick.Services.Editor",
+    "rootNamespace": "OneFinalClick.Services.Editor",
     "references": [
-        "FinalClick.Services.Runtime",
-        "FinalClick.ProjectSettings.Runtime",
-        "FinalClick.ProjectSettings.Editor"
+        "OneFinalClick.Services.Runtime",
+        "OneFinalClick.ProjectSettings.Runtime",
+        "OneFinalClick.ProjectSettings.Editor"
     ],
     "includePlatforms": [
         "Editor"

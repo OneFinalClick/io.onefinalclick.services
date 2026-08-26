@@ -1,9 +1,9 @@
 {
-    "name": "io.finalclick.services",
-    "displayName": "FinalClick - Services",
+    "name": "io.onefinalclick.services",
+    "displayName": "OneFinalClick - Services",
     "author": {
-        "name": "FinalClick",
-        "url": "https://github.com/FinalClick"
+        "name": "OneFinalClick",
+        "url": "onefinalclick.io"
     },
     "keywords": [
         "services",
@@ -12,7 +12,7 @@
         "dependency"
     ],
     "version": "2.2.0",
-    "unity": "2019.4",
+    "unity": "6000.0",
     "description": "A lightweight service registration and dependency access framework for Unity.",
     "dependencies": {
         "io.finalclick.projectsettings": "1.0.0"

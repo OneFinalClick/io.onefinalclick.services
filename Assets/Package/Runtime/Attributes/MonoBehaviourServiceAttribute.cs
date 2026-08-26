@@ -1,6 +1,6 @@
 using System;
 
-namespace FinalClick.Services.Attributes
+namespace OneFinalClick.Services.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class MonoBehaviourServiceAttribute : Attribute
