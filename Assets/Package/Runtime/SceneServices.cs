@@ -20,7 +20,7 @@ namespace OneFinalClick.Services
                 return false;
             }
 
-            return true;
+            return services.IsStarted;
         }
         
         [UsedImplicitly]
