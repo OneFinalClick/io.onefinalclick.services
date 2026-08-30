@@ -1,4 +1,4 @@
-namespace OneFinalClick.Services
+namespace OneLastClick.Services
 {
     public interface IServiceRegisterer
     {

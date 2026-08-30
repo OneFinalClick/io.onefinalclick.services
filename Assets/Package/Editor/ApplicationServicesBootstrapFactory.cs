@@ -1,8 +1,8 @@
-using OneFinalClick.ProjectSettings;
-using OneFinalClick.ProjectSettings.Editor;
+using OneLastClick.ProjectSettings;
+using OneLastClick.ProjectSettings.Editor;
 using UnityEngine;
 
-namespace OneFinalClick.Services.Editor
+namespace OneLastClick.Services.Editor
 {
     public class ApplicationServicesBootstrapFactory
     {

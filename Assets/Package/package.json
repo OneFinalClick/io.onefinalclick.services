@@ -1,9 +1,9 @@
 {
-    "name": "io.onefinalclick.services",
-    "displayName": "OneFinalClick - Services",
+    "name": "io.onelastclick.services",
+    "displayName": "OneLastClick - Services",
     "author": {
-        "name": "OneFinalClick",
-        "url": "onefinalclick.io"
+        "name": "OneLastClick",
+        "url": "docs.onelastclick.io"
     },
     "keywords": [
         "services",
@@ -11,10 +11,10 @@
         "injection",
         "dependency"
     ],
-    "version": "2.2.0",
+    "version": "1.0.0",
     "unity": "6000.0",
     "description": "A lightweight service registration and dependency access framework for Unity.",
     "dependencies": {
-        "io.onefinalclick.projectsettings": "1.0.0"
+        "io.onelastclick.projectsettings": "1.0.0"
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace OneFinalClick.Services.Editor
+namespace OneLastClick.Services.Editor
 {
     internal static class ApplicationServicesEditorInitializer
     {

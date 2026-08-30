@@ -1,4 +1,4 @@
-namespace OneFinalClick.Services.Injection
+namespace OneLastClick.Services.Injection
 {
     public static class ServiceInjection
     {

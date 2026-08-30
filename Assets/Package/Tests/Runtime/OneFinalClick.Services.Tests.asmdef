@@ -1,10 +1,10 @@
 {
-    "name": "OneFinalClick.Services.Tests",
-    "rootNamespace": "OneFinalClick.Services.Tests",
+    "name": "OneLastClick.Services.Tests",
+    "rootNamespace": "OneLastClick.Services.Tests",
     "references": [
         "UnityEngine.TestRunner",
-        "OneFinalClick.Services.Runtime",
-        "OneFinalClick.Services.Editor"
+        "OneLastClick.Services.Runtime",
+        "OneLastClick.Services.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

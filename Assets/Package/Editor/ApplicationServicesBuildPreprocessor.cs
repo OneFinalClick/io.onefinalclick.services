@@ -3,7 +3,7 @@ using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace OneFinalClick.Services.Editor
+namespace OneLastClick.Services.Editor
 {
     public class ApplicationServicesBuildPreprocessor : IProcessSceneWithReport
     {

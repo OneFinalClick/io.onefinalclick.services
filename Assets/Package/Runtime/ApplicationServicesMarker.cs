@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace OneFinalClick.Services
+namespace OneLastClick.Services
 {
     /// <summary>
     /// This will be ran really early in the initial to register all application services.

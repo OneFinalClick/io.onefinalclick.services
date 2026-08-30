@@ -2,7 +2,7 @@ using System;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace OneFinalClick.Services
+namespace OneLastClick.Services
 {
     public static class GameObjectExtensions
     {
