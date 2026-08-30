@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" />
+    </ItemGroup>
+
+    <Target Name="CopyToUnityPackage" AfterTargets="Build">
+    <Copy
+        SourceFiles="$(TargetPath)"
+        DestinationFolder="$(MSBuildProjectDirectory)/../../Assets/Package/SourceGenerators"
+        SkipUnchangedFiles="true" />
+    </Target>
+
+</Project>
